@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,15 +13,13 @@ userMentions.forEach((mention) => __awaiter(void 0, void 0, void 0, function* ()
         const username = mention.textContent;
         const commentsByUser = yield findCommentsByUser(username);
         const summary = findSummaryPanelByUsername(username);
-        for (const comment in commentsByUser) {
-            const commentRow = document.createTextNode(`${comment !== null && comment !== void 0 ? comment : ''}\n`);
-            summary === null || summary === void 0 ? void 0 : summary.appendChild(commentRow);
-        }
+        commentsByUser[username].forEach((comment) => {
+            addCommentToSummary(summary, comment);
+        });
     }));
 }));
 const findCommentsByUser = (username) => __awaiter(void 0, void 0, void 0, function* () {
-    const storageComments = yield chrome.storage.local.get(username);
-    console.log(storageComments);
+    const storageComments = yield chrome.storage.local.get([username]);
     if (Object.keys(storageComments).length != 0) {
         console.log('Inside if statement');
         return storageComments;
@@ -36,10 +33,30 @@ const findCommentsByUser = (username) => __awaiter(void 0, void 0, void 0, funct
         const commentContainer = comment.querySelector('div.text > p');
         return (_a = commentContainer === null || commentContainer === void 0 ? void 0 : commentContainer.textContent) === null || _a === void 0 ? void 0 : _a.trim();
     });
-    chrome.storage.local.set({ username: comments }, () => console.log(`Saved ${username} to local storage!`));
-    console.log(comments);
-    return comments;
+    chrome.storage.local.set({
+        [username]: comments !== null && comments !== void 0 ? comments : Array.from([])
+    }, () => console.log(`Saved ${JSON.stringify({ [username]: comments !== null && comments !== void 0 ? comments : Array.from([]) })}`));
+    return {
+        [username]: comments
+    };
 });
 const findSummaryPanelByUsername = (username) => {
-    return document.querySelector(`div.summary[data-login=${username}]`);
+    const summary = document.querySelector(`div.summary[data-login=${username}]`);
+    if (!(summary === null || summary === void 0 ? void 0 : summary.querySelector('div.comments'))) {
+        addCommentContainerToSummary(summary);
+    }
+    return summary;
+};
+const addCommentContainerToSummary = (summary) => {
+    const commentContainer = document.createElement('div');
+    commentContainer.className = 'comments';
+    summary.appendChild(commentContainer);
+};
+const addCommentToSummary = (summary, comment) => {
+    var _a;
+    const row = document.createElement('p');
+    row.className = 'comment';
+    const textContainer = document.createTextNode(`${comment !== null && comment !== void 0 ? comment : ''}\n`);
+    row.appendChild(textContainer);
+    (_a = summary.querySelector('div.comments')) === null || _a === void 0 ? void 0 : _a.appendChild(row);
 };

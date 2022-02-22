@@ -22,7 +22,24 @@ chrome.tabs.onUpdated.addListener(() => __awaiter(void 0, void 0, void 0, functi
             target: { tabId: tabId },
             files: ['dist/style.css']
         });
-        // chrome.storage.local.clear();
+        chrome.storage.local.clear();
+    }
+}));
+chrome.tabs.onActivated.addListener(() => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const tab = yield getCurrentTab();
+    const url = (_b = tab.url) !== null && _b !== void 0 ? _b : '';
+    if (/https:\/\/www\.wykop\.pl\/wpis.*/.test(url)) {
+        const tabId = tab.id;
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ['dist/foreground.js'],
+        });
+        chrome.scripting.insertCSS({
+            target: { tabId: tabId },
+            files: ['dist/style.css']
+        });
+        chrome.storage.local.clear();
     }
 }));
 const getCurrentTab = () => __awaiter(void 0, void 0, void 0, function* () {

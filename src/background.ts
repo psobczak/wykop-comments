@@ -15,7 +15,27 @@ chrome.tabs.onUpdated.addListener(async () => {
             files: ['dist/style.css']
         })
 
-        // chrome.storage.local.clear();
+        chrome.storage.local.clear();
+    }
+})
+
+chrome.tabs.onActivated.addListener(async () => {
+    const tab = await getCurrentTab();
+    const url = tab.url ?? '';
+    if (/https:\/\/www\.wykop\.pl\/wpis.*/.test(url)) {
+        const tabId = tab.id!;
+
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            files: ['dist/foreground.js'],
+        });
+
+        chrome.scripting.insertCSS({
+            target: { tabId: tabId },
+            files: ['dist/style.css']
+        })
+
+        chrome.storage.local.clear();
     }
 })
 

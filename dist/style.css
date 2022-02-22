@@ -5,3 +5,17 @@ div.comment {
     height: 20px; 
     width: 20px;
 }
+
+p.comment:hover {
+    background-color: cornsilk;
+    padding: 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    color: black;
+}
+
+div.comments {
+    border-top: 2px;
+    border-color: black;
+    margin: 1px;
+}
